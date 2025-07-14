@@ -3,6 +3,8 @@
 import os
 import sys
 
+import dotenv
+
 
 def main():
     """Run administrative tasks."""
