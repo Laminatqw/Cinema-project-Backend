@@ -1,0 +1,22 @@
+services:
+  app:
+    build:
+      context: .
+    volumes:
+      - ./backend:/app
+    env_file:
+      - .env
+    ports:
+      - "8888:8000"
+    restart: on-failure
+    command: >
+      sh -c "python manage.py wait_db && python manage.py runserver 0.0.0.0:8000"
+  db:
+    image: mysql:8
+    env_file:
+      - .env
+    volumes:
+      - ./mysql_db:/var/lib/mysql
+    ports:
+      - "3333:3306"
+    restart: on-failure

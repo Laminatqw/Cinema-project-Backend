@@ -1,10 +1,12 @@
-from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 
 from core.models import BaseModel
 
+from apps.users.managers import UserManager
 
-class UserModel(AbstractBaseUser, BaseModel):
+
+class UserModel(AbstractBaseUser, BaseModel, PermissionsMixin):
 
     class Meta:
         db_table = 'auth_user'
@@ -14,15 +16,16 @@ class UserModel(AbstractBaseUser, BaseModel):
     is_staff = models.BooleanField(default=False)
     USERNAME_FIELD = 'email'
 
+    objects = UserManager()
 
-class Profile(BaseModel):
+
+class ProfileModel(BaseModel):
     class Meta:
         db_table = 'profile'
     name = models.CharField(max_length=120)
     surname = models.CharField(max_length=120, blank=True)
     age = models.IntegerField()
     user = models.OneToOneField(UserModel, on_delete=models.CASCADE)
-
 
 
 
