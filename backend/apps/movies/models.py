@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.timezone import now
 
 from core.models import BaseModel
 
@@ -16,5 +17,14 @@ class MovieModel(BaseModel):
     rating = models.IntegerField()
     genre = models.CharField(max_length=100)
     year = models.IntegerField()
-    is_now_showing = models.BooleanField()
+    release_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+    def __str__(self):
+        return self.name
+
+    @property
+    def is_now_showing(self):
+        today = now().date()
+        return self.release_date <= today <= self.end_date
+
 
