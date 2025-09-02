@@ -15,6 +15,7 @@ django-filter = "^25.1"
 mysqlclient = "^2.2.7"
 pillow = "^11.3.0"
 djangorestframework-simplejwt = "^5.5.1"
+django-qr-code = "^4.2.0"
 
 
 [build-system]
