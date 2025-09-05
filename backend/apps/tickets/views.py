@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from qr_code import qrcode
 
+from apps import sessions
 from apps.tickets.models import TicketModel
 from apps.tickets.serializer import TicketSerializer
 
@@ -35,12 +36,13 @@ def ticket_qr_view(request, pk):
     ticket = get_object_or_404(TicketModel, pk=pk)
 
     # Дані для QR
-    qr_data = f"Ticket ID: {ticket.id} | Session: {ticket.session_id} | Seat: {ticket.seat_id}"
+    qr_data = f"Ticket ID: {ticket.id} | Session: {ticket.session_id} | Seat: {ticket.seat_id},"
 
     # Генеруємо QR-код як PNG
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
     qr.add_data(qr_data)
     qr.make(fit=True)
+
 
     img = qr.make_image(fill="black", back_color="white")
 

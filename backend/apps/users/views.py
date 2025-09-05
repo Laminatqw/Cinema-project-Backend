@@ -3,7 +3,13 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import render
 
 from rest_framework import status
-from rest_framework.generics import GenericAPIView, ListCreateAPIView, UpdateAPIView, get_object_or_404
+from rest_framework.generics import (
+    GenericAPIView,
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView,
+    UpdateAPIView,
+    get_object_or_404,
+)
 from rest_framework.mixins import UpdateModelMixin
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
@@ -20,6 +26,14 @@ class UsersListCreateView(ListCreateAPIView):
     queryset = UserModel.objects.all()
     serializer_class = UserSerializer
     permission_classes = (AllowAny,)
+
+
+class UsersRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
+    serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_object(self):
+        return self.request.user
 
 
 class RegisterUserView(GenericAPIView):
