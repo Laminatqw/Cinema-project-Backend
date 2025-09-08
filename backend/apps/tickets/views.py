@@ -2,15 +2,18 @@ from io import BytesIO
 
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
+from django.utils import timezone
 
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from qr_code import qrcode
+import qrcode
 
 from apps import sessions
 from apps.tickets.models import TicketModel
-from apps.tickets.serializer import TicketSerializer
+from apps.tickets.serializer import TicketDetailSerializer, TicketSerializer
 
 # Create your views here.
 
@@ -22,6 +25,9 @@ class TicketsListView(ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    def get_queryset(self):
+        return TicketModel.objects.filter(user=self.request.user)
+
 class TicketsDetailView(RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = TicketSerializer
@@ -32,22 +38,59 @@ class TicketsDetailView(RetrieveUpdateDestroyAPIView):
 
 
 
-def ticket_qr_view(request, pk):
-    ticket = get_object_or_404(TicketModel, pk=pk)
+class TicketQRView(APIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = TicketDetailSerializer
 
-    # Дані для QR
-    qr_data = f"Ticket ID: {ticket.id} | Session: {ticket.session_id} | Seat: {ticket.seat_id},"
+    def get(self, request, pk):
+        ticket = get_object_or_404(TicketModel, pk=pk, user=request.user)
 
-    # Генеруємо QR-код як PNG
-    qr = qrcode.QRCode(version=1, box_size=10, border=5)
-    qr.add_data(qr_data)
-    qr.make(fit=True)
+        # QR містить тільки id квитка
+        qr_data = str(ticket.id)
+
+        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr.add_data(qr_data)
+        qr.make(fit=True)
+
+        img = qr.make_image(fill="black", back_color="white")
+
+        buffer = BytesIO()
+        img.save(buffer, format="PNG")
+        buffer.seek(0)
+
+        return HttpResponse(buffer, content_type="image/png")
 
 
-    img = qr.make_image(fill="black", back_color="white")
+class TicketValidateView(APIView):
+    permission_classes = (IsAdminUser,)
 
-    buffer = BytesIO()
-    img.save(buffer, format="PNG")
-    buffer.seek(0)
+    def post(self, request):
+        ticket_id = request.data.get("ticket_id")
+        ticket = get_object_or_404(TicketModel, pk=ticket_id)
 
-    return HttpResponse(buffer, content_type="image/png")
+        # Перевірки
+        if ticket.status == "used":
+            return Response({"valid": False, "reason": "Квиток вже використаний"}, status=400)
+
+        if ticket.session.start_time < timezone.now() < ticket.session.end_time:
+            # Маркуємо як використаний
+            ticket.status = "used"
+            ticket.save()
+            return Response({"valid":True,
+                             "reason":"Квиток провалідовано",
+                            "ticket_id": ticket.id,
+                            "movie": ticket.session.movie.name,
+                            "hall": ticket.seat.hall.title,
+                            "row": ticket.seat.row,
+                            "seat": ticket.seat.number,
+                            "time": ticket.session.start_time}, status=200)
+
+        elif ticket.session.start_time > timezone.now():
+            return Response({"valid": False, "reason": "Сеанс ще не почався"}, status=400)
+
+        elif ticket.session.end_time > timezone.now():
+            return Response({"valid":False, "reason": "Сеанс вже закінчився"}, status=400)
+
+
+
+

@@ -16,13 +16,14 @@ class TicketModel(BaseModel):
         ("reserved", "Reserved"),  # заброньований, але ще не оплачений
         ("paid", "Paid"),  # оплачений
         ("canceled", "Canceled"),  # відмінений
+        ("used","Used"),# використаний
     ]
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     session = models.ForeignKey(SessionModel, on_delete=models.CASCADE)
     seat = models.ForeignKey(HallSeatModel, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="reserved")
-    qr_code = models.ImageField(upload_to="photo_storage/qr_codes/", blank=True, null=True)
+    # qr_code = models.ImageField(upload_to="photo_storage/qr_codes/", blank=True, null=True)
 
-    read_only_fields = ["status", "qr_code", "created_at"]
+    read_only_fields = ["status", "created_at"]
 
 

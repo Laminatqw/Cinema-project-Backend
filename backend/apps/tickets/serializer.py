@@ -1,7 +1,6 @@
 from io import BytesIO
 
 from django.core.files import File
-from django.urls import reverse
 
 from rest_framework import serializers
 
@@ -13,25 +12,39 @@ from apps.tickets.models import TicketModel
 class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = TicketModel
-        fields = ('user','session','seat','status','qr_code')
+        fields = ('user','session','seat','status')
 
 
     def get_qr_code_url(self, obj):
-        # лінк на спеціальний ендпоінт, що верне QR
         request = self.context.get("request")
-        url = reverse("ticket_qr", kwargs={"pk": obj.pk})
-        return request.build_absolute_uri(url)
+        if request:
+            return request.build_absolute_uri(f"/api/tickets/{obj.pk}/qr/")
+        return f"/api/tickets/{obj.pk}/qr/"
 
     def create(self, validated_data):
         ticket = super().create(validated_data)
-
-        # Генерація QR-коду
-        qr = qrcode.make(f"Ticket ID: {ticket.id}, Session: {ticket.session_id}, Seat: {ticket.seat_id}")
-        buffer = BytesIO()
-        qr.save(buffer, format="PNG")
-
-        # Зберігаємо у поле qr_code
-        ticket.qr_code.save(f"ticket_{ticket.id}.png", File(buffer), save=False)
-        ticket.save()
-
         return ticket
+
+class TicketDetailSerializer(serializers.ModelSerializer):
+    # з seat
+    hall = serializers.CharField(source="seat.hall.title")
+    row = serializers.IntegerField(source="seat.row")
+    number = serializers.IntegerField(source="seat.number")
+    seat_type = serializers.CharField(source="seat.seat_type")
+
+    # з session → movie
+    movie = serializers.CharField(source="session.movie.name")
+    start_time = serializers.DateTimeField(source="session.start_time")
+
+    class Meta:
+        model = TicketModel
+        fields = (
+            "id",
+            "status",
+            "hall",
+            "row",
+            "number",
+            "seat_type",
+            "movie",
+            "start_time",
+        )
