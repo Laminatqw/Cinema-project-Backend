@@ -18,26 +18,61 @@ from apps.halls.serializer import HallSeatSerializer, HallSerializer
 
 
 # Create your views here.
-class HallListView(ListCreateAPIView):
-    permission_classes = (IsAdminUser,)
+class HallListCreateView(ListCreateAPIView):
+    """
+        get:
+            shows all halls(for all users)
+        post:
+            creates a new hall(only for staff)
+        """
+
     serializer_class = HallSerializer
     queryset = HallModel.objects.all()
 
 
+
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
 
 
 class HallDetailView(RetrieveUpdateDestroyAPIView):
-    permission_classes = (IsAdminUser,)
+    """
+        get:
+            shows hall by id
+        post:
+            creates a new hall(only for staff)
+        patch:
+            updates a hall by id(only for staff)
+        delete:
+            deletes a hall by id(only for staff)
+    """
     serializer_class = HallSerializer
     queryset = HallModel.objects.all()
 
+
+
+
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
 
 # HallSeat
 
 
 class HallSeatListView(ListCreateAPIView):
+    """
+    get:
+        shows all hall seats(for all users) by hall_id
+    post
+        creates a new hall seat|seats(only for staff) by hall_id
+    """
+
     serializer_class = HallSeatSerializer
-    permission_classes = (IsAdminUser,)
 
     def get_queryset(self):
         hall_id = self.kwargs.get("hall_id")
@@ -68,6 +103,14 @@ class HallSeatListView(ListCreateAPIView):
 
     
 class HallSeatDetailView(RetrieveUpdateDestroyAPIView):
+    """
+    get:
+        shows seat by id(for all users)
+    delete:
+        deletes seat by id(only for staff)
+    """
+
+
     permission_classes = (IsAdminUser,)
     serializer_class = HallSeatSerializer
     queryset = HallSeatModel.objects.all()

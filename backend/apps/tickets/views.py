@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
+from rest_framework import permissions
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
@@ -18,6 +19,14 @@ from apps.tickets.serializer import TicketDetailSerializer, TicketSerializer
 # Create your views here.
 
 class TicketsListView(ListCreateAPIView):
+
+    """
+    get:
+        shows user only his tickets(if not staff)
+    post:
+        creates ticket(for authenticated user)
+    """
+
     permission_classes = (IsAuthenticated,)
     serializer_class = TicketSerializer
     queryset = TicketModel.objects.all()
@@ -29,24 +38,42 @@ class TicketsListView(ListCreateAPIView):
         return TicketModel.objects.filter(user=self.request.user)
 
 class TicketsDetailView(RetrieveUpdateDestroyAPIView):
-    permission_classes = (IsAuthenticated,)
+
+    """
+    get:
+        shows authenticated user detailed info about his ticket, by id
+    patch:
+        edits ticket info by id(only for staff)
+    delete:
+        deletes ticket by id(only for staff)
+    """
+
     serializer_class = TicketSerializer
     queryset = TicketModel.objects.all()
 
     def get_queryset(self):
         return TicketModel.objects.filter(user=self.request.user)
 
-
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [permissions.IsAuthenticated()]
+        return [permissions.IsAdminUser()]
 
 class TicketQRView(APIView):
+
+    """
+    get:
+        returns qr-code of ticket by uuid
+    """
+
     permission_classes = (IsAuthenticated,)
     serializer_class = TicketDetailSerializer
 
-    def get(self, request, pk):
-        ticket = get_object_or_404(TicketModel, pk=pk, user=request.user)
+    def get(self, request, uuid):
+        ticket = get_object_or_404(TicketModel, uuid=uuid, user=request.user)
 
         # QR містить тільки id квитка
-        qr_data = str(ticket.id)
+        qr_data = uuid
 
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
         qr.add_data(qr_data)
@@ -62,11 +89,17 @@ class TicketQRView(APIView):
 
 
 class TicketValidateView(APIView):
+
+    """
+    post:
+        checks if ticket is valid, if true changes is to used
+    """
+
     permission_classes = (IsAdminUser,)
 
     def post(self, request):
-        ticket_id = request.data.get("ticket_id")
-        ticket = get_object_or_404(TicketModel, pk=ticket_id)
+        uuid = request.data.get("uuid")
+        ticket = get_object_or_404(TicketModel, uuid=uuid)
 
         # Перевірки
         if ticket.status == "used":
@@ -88,7 +121,7 @@ class TicketValidateView(APIView):
         elif ticket.session.start_time > timezone.now():
             return Response({"valid": False, "reason": "Сеанс ще не почався"}, status=400)
 
-        elif ticket.session.end_time > timezone.now():
+        else:
             return Response({"valid":False, "reason": "Сеанс вже закінчився"}, status=400)
 
 

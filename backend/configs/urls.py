@@ -18,7 +18,22 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from rest_framework.permissions import AllowAny
+
 from configs import settings
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Cinema backend",
+        default_version='v1',
+        description="About Cinema",
+        contact=openapi.Contact(email="admin@gmail.com"),
+    ),
+    public=True,
+    permission_classes=(AllowAny,),
+)
 
 urlpatterns = [
     path('api/movies', include('apps.movies.urls')),
@@ -27,6 +42,8 @@ urlpatterns = [
     path('api/halls', include('apps.halls.urls')),
     path('api/sessions', include('apps.sessions.urls')),
     path('api/tickets', include('apps.tickets.urls')),
+    path('api/doc',schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    # path('admin/', admin.site.urls),
 ]
 
 

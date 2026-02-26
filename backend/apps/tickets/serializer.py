@@ -10,16 +10,17 @@ from apps.tickets.models import TicketModel
 
 
 class TicketSerializer(serializers.ModelSerializer):
+    qr_code_url = serializers.SerializerMethodField()
     class Meta:
         model = TicketModel
-        fields = ('user','session','seat','status')
+        fields = ('uuid','user','session','seat','status', 'qr_code_url')
 
 
     def get_qr_code_url(self, obj):
         request = self.context.get("request")
         if request:
-            return request.build_absolute_uri(f"/api/tickets/{obj.pk}/qr/")
-        return f"/api/tickets/{obj.pk}/qr/"
+            return request.build_absolute_uri(f"/api/tickets/{obj.uuid}/qr/")
+        return f"/api/tickets/{obj.uuid}/qr/"
 
     def create(self, validated_data):
         ticket = super().create(validated_data)
@@ -40,6 +41,7 @@ class TicketDetailSerializer(serializers.ModelSerializer):
         model = TicketModel
         fields = (
             "id",
+            "uuid",
             "status",
             "hall",
             "row",

@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 
 from core.models import BaseModel
@@ -18,6 +20,7 @@ class TicketModel(BaseModel):
         ("canceled", "Canceled"),  # відмінений
         ("used","Used"),# використаний
     ]
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     session = models.ForeignKey(SessionModel, on_delete=models.CASCADE)
     seat = models.ForeignKey(HallSeatModel, on_delete=models.CASCADE)

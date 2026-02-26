@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 from core.models import BaseModel
 
@@ -15,6 +16,13 @@ class SessionModel(BaseModel):
     hall = models.ForeignKey(HallModel, on_delete=models.CASCADE, related_name="sessions", null=True, blank=True)
     start_time = models.DateTimeField(blank=True, null=True)
     end_time = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+
+    def save(self, *args, **kwargs):
+        if self.end_time < timezone.now():
+            self.is_active = False
+        super().save(*args, **kwargs)
 
 class SessionPriceModel(BaseModel):
     class Meta:

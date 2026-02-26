@@ -12,7 +12,7 @@ class UserModel(AbstractBaseUser, BaseModel, PermissionsMixin):
         db_table = 'auth_user'
 
     email = models.EmailField(unique=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     USERNAME_FIELD = 'email'
 
@@ -24,7 +24,7 @@ class ProfileModel(BaseModel):
         db_table = 'profile'
     name = models.CharField(max_length=120)
     surname = models.CharField(max_length=120, blank=True)
-    age = models.IntegerField(max_length=120, blank=True, null=True)
+    age = models.IntegerField(blank=True, null=True)
     user = models.OneToOneField(UserModel, on_delete=models.CASCADE, related_name='profile')
 
 

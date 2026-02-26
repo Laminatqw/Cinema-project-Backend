@@ -3,6 +3,8 @@ from django.db.transaction import atomic
 
 from rest_framework import serializers
 
+from core.services.email_services import EmailService
+
 from apps.users.models import ProfileModel
 
 # from core.services.email_service import EmailService
@@ -51,6 +53,7 @@ class UserSerializer(serializers.ModelSerializer):
         validated_data['is_active'] = True
         if profile_data:
             ProfileModel.objects.create(user=user, **profile_data)
+        EmailService.register(user)
         return user
 
     def update(self, instance, validated_data):

@@ -2,7 +2,7 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import render
 
-from rest_framework import status
+from rest_framework import permissions, status
 from rest_framework.generics import (
     GenericAPIView,
     ListCreateAPIView,
@@ -13,6 +13,8 @@ from rest_framework.generics import (
 from rest_framework.mixins import UpdateModelMixin
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.users.serializers import UserSerializer
 
@@ -25,31 +27,36 @@ UserModel = get_user_model()
 class UsersListCreateView(ListCreateAPIView):
     queryset = UserModel.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAdminUser,)
 
 
 class UsersRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
+
+    """
+    get:
+        shows user info about his account
+    patch:
+        edits info about users account
+    delete:
+        deletes user account
+    """
+
+
     serializer_class = UserSerializer
-    permission_classes = (IsAuthenticated,)
 
     def get_object(self):
         return self.request.user
+
+    def get_permissions(self):
+        if self.request.method in ['GET','PATCH', 'DELETE']:
+            return [permissions.IsAuthenticated()]
+        return [permissions.IsAdminUser()]
 
 
 class RegisterUserView(GenericAPIView):
     serializer_class = UserSerializer
     queryset = UserModel.objects.all()
     permission_classes = [AllowAny]
-
-    def get(self, request, *args, **kwargs):
-        # Доступ лише для автентифікованих
-        if not request.user.is_authenticated:
-            return Response(
-                {'detail': 'Authentication credentials were not provided.'},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
-        serializer = self.get_serializer(request.user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -60,3 +67,22 @@ class RegisterUserView(GenericAPIView):
                 status=status.HTTP_201_CREATED
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+
+            return Response(
+                {"detail":"Successfully logged out."},
+                status = status.HTTP_205_RESET_CONTENT
+            )
+        except Exception:
+            return Response(
+                {"detail": "Invalid token."},
+                status=status.HTTP_400_BAD_REQUEST
+            )

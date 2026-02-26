@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
+from celery.schedules import crontab
+
 from .extra_conf import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -42,7 +44,9 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'qrcode',
-
+    'django_celery_beat',
+    'django_celery_results',
+    'drf_yasg',
 
     #my_apps
     'core',
@@ -52,6 +56,7 @@ INSTALLED_APPS = [
     'apps.halls',
     'apps.sessions',
     'apps.tickets',
+
 
 ]
 
@@ -70,7 +75,7 @@ ROOT_URLCONF = 'configs.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -101,6 +106,16 @@ DATABASES = {
 }
 
 
+CELERY_BEAT_SCHEDULE = {
+    "update_sessions_status": {
+        "task": "cinema_app.tasks.update_sessions_status",
+        "schedule": crontab(minute=0, hour="*"),  # щогодини
+    },
+    "delete_old_sessions": {
+        "task": "cinema_app.tasks.delete_old_sessions",
+        "schedule": crontab(minute=0, hour=0, day_of_month="1"),  # раз на місяць
+    },
+}
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -135,7 +150,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/drf-static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'photo_storage')
 MEDIA_URL = '/media/'
 # Default primary key field type

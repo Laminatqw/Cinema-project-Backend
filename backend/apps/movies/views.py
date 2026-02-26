@@ -12,36 +12,58 @@ from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 
 from core.permissions.is_superuser_permission import IsSuperUser
 
-from apps.movies.models import MovieModel
-from apps.movies.serializer import MovieSerializer
+# from urllib3 import request
+
+from apps.movies.models import GenreModel, MovieModel
+from apps.movies.serializer import GenreSerializer, MovieSerializer
 
 # Create your views here.
 
-class MovieListView(ListAPIView):
-    permission_classes = (AllowAny, )
+class MovieListCreateView(ListCreateAPIView):
+
+    """
+    get:
+        shows all movies(for anyone)
+    post:
+        creates a new movie(for staff only)
+    """
+
     serializer_class = MovieSerializer
     queryset = MovieModel.objects.all()
 
-class MovieCreateView(CreateAPIView):
-    serializer_class = MovieSerializer
-    queryset = MovieModel.objects.all()
-    permission_classes = (IsAdminUser, )
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
 
-    def post(self, request, *args, **kwargs):
-        print("AUTH HEADER:", request.headers.get("Authorization"))
-        print("USER:", request.user)
-        print("IS STAFF:", request.user.is_staff)
-        print("IS SUPERUSER:", request.user.is_superuser)
-        return super().post(request, *args, **kwargs)
+
 
 class MovieDetailView(RetrieveUpdateDestroyAPIView):
-    permission_classes = (IsAdminUser,)
+
+    """
+    get:
+        shows one movie by id(for anyone)
+    patch:
+        edits movie info by id(for staff)
+    destroy:
+        deletes movie by id(for staff)
+    """
+
     serializer_class = MovieSerializer
     queryset = MovieModel.objects.all()
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
 
 
 
 class MovieAddPhoto(UpdateAPIView):
+    """
+    patch:
+        adds photo|poster to movie by id(for staff)
+    """
     permission_classes = (IsAdminUser,)
     serializer_class = MovieSerializer
     queryset = MovieModel.objects.all()
@@ -52,4 +74,38 @@ class MovieAddPhoto(UpdateAPIView):
         movie.picture.delete()
         super().perform_update(serializer)
 
+class GenresListCreateAPIView(ListCreateAPIView):
+    """
+    get:
+        shows all genres(for anyone)
+    post:
+        creates genre(for staff only)
+    """
+    serializer_class = GenreSerializer
+    queryset = GenreModel.objects.all()
+    
+    def get_permissions(self):
+        if self.request.method == "POST":
+            return [permissions.IsAdminUser()]
+        return [permissions.AllowAny()]
 
+class GenreDetailAPIView(RetrieveUpdateDestroyAPIView):
+
+    """
+    get:
+        shows one genre by id(for anyone)
+    patch:
+        edits genre info by id(for staff)
+    delete:
+        deletes genre by id(for staff)
+    """
+
+    serializer_class = GenreSerializer
+    queryset = GenreModel.objects.all()
+
+
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
