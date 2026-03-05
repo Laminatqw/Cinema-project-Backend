@@ -119,7 +119,14 @@ class TicketValidateView(APIView):
                             "time": ticket.session.start_time}, status=200)
 
         elif ticket.session.start_time > timezone.now():
-            return Response({"valid": False, "reason": "Сеанс ще не почався"}, status=400)
+            return Response({
+                             "ticket_id": ticket.id,
+                             "movie": ticket.session.movie.name,
+                             "hall": ticket.seat.hall.title,
+                             "row": ticket.seat.row,
+                             "seat": ticket.seat.number,
+                             "valid": False, "reason": "Сеанс ще не почався",
+                             "time": ticket.session.start_time}, status=400)
 
         else:
             return Response({"valid":False, "reason": "Сеанс вже закінчився"}, status=400)
