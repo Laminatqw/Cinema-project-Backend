@@ -13,7 +13,7 @@ class TicketSerializer(serializers.ModelSerializer):
     qr_code_url = serializers.SerializerMethodField()
     class Meta:
         model = TicketModel
-        fields = ('uuid','user','session','seat','status', 'qr_code_url')
+        fields = ('id','uuid','user','session','seat','status', 'qr_code_url')
 
 
     def get_qr_code_url(self, obj):

@@ -395,6 +395,21 @@ celery = ">=5.2.7,<6.0"
 Django = ">=3.2.25"
 
 [[package]]
+name = "django-cors-headers"
+version = "4.9.0"
+description = "django-cors-headers is a Django application for handling the server headers required for Cross-Origin Resource Sharing (CORS)."
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "django_cors_headers-4.9.0-py3-none-any.whl", hash = "sha256:15c7f20727f90044dcee2216a9fd7303741a864865f0c3657e28b7056f61b449"},
+    {file = "django_cors_headers-4.9.0.tar.gz", hash = "sha256:fe5d7cb59fdc2c8c646ce84b727ac2bca8912a247e6e68e1fb507372178e59e8"},
+]
+
+[package.dependencies]
+asgiref = ">=3.6"
+django = ">=4.2"
+
+[[package]]
 name = "django-dotenv"
 version = "1.4.2"
 description = "foreman reads from .env. manage.py doesn't. Let's fix that."
@@ -1407,4 +1422,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "cee2c3770b804d60583b9ae027f87d9e6fe29535bcbdadd424976c4380f05c97"
+content-hash = "c816a000a481ee826a0c21122b9f1029276def0303fa7beafbe6c9b541ea719e"

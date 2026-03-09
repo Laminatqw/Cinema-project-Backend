@@ -25,6 +25,7 @@ beet = "^0.111.0"
 django-celery-beat = "^2.8.1"
 stripe = "^12.5.1"
 drf-yasg = "^1.21.10"
+django-cors-headers = "^4.9.0"
 
 
 [build-system]

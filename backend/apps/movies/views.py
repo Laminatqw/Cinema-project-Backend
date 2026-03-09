@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework import permissions
 from rest_framework.generics import (
@@ -10,6 +11,7 @@ from rest_framework.generics import (
 )
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 
+from apps.movies.filters import MovieFilter
 from core.permissions.is_superuser_permission import IsSuperUser
 
 # from urllib3 import request
@@ -30,6 +32,9 @@ class MovieListCreateView(ListCreateAPIView):
 
     serializer_class = MovieSerializer
     queryset = MovieModel.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = MovieFilter
+
 
     def get_permissions(self):
         if self.request.method == "GET":

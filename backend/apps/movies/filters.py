@@ -6,17 +6,18 @@ from apps.movies.models import MovieModel
 
 
 class MovieFilter(filters.FilterSet):
-    # rating = filters.NumberFilter(field_name='rating', lookup_expr='exact')
-    name = filters.CharFilter(field_name='name', lookup_expr='icontains')
-    length_max = filters.CharFilter(field_name='length', lookup_expr='gte')
-    length_min = filters.CharFilter(field_name='length', lookup_expr='lte')
-    rating = filters.CharFilter(field_name='rating', lookup_expr='exact')
-    rating_max = filters.CharFilter(field_name='rating', lookup_expr='gte')
-    rating_min = filters.CharFilter(field_name='rating', lookup_expr='lte')
-    genre = filters.CharFilter(field_name='genre', lookup_expr='icontains')
-    year = filters.CharFilter(field_name='year', lookup_expr='year')
-    year_max = filters.CharFilter(field_name='year', lookup_expr='year__gte')
-    year_min = filters.CharFilter(field_name='year', lookup_expr='year__lte')
+    class MovieFilter(filters.FilterSet):
+
+        name = filters.CharFilter(lookup_expr="icontains")
+        genre = filters.CharFilter(lookup_expr="icontains")
+
+        class Meta:
+            model = MovieModel
+            fields = {
+                "rating": ["exact", "gte", "lte"],
+                "length": ["gte", "lte"],
+                "year": ["year", "year__gte", "year__lte"],
+            }
 
     IS_NOW_SHOWING_CHOICES = (
         ('yes', 'Yes'),
