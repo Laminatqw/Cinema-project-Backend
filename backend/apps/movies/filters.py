@@ -6,17 +6,16 @@ from apps.movies.models import MovieModel
 
 
 class MovieFilter(filters.FilterSet):
-    class MovieFilter(filters.FilterSet):
 
-        name = filters.CharFilter(lookup_expr="icontains")
-        genre = filters.CharFilter(lookup_expr="icontains")
+    name = filters.CharFilter(lookup_expr="icontains")
+    genre = filters.BaseInFilter(field_name="genre__id", lookup_expr="in")
 
-        class Meta:
-            model = MovieModel
-            fields = {
-                "rating": ["exact", "gte", "lte"],
-                "length": ["gte", "lte"],
-                "year": ["year", "year__gte", "year__lte"],
+    class Meta:
+        model = MovieModel
+        fields = {
+            "rating": ["exact", "gte", "lte"],
+            "length": ["gte", "lte"],
+            "year": ["exact", "gte", "lte"],
             }
 
     IS_NOW_SHOWING_CHOICES = (
@@ -32,7 +31,7 @@ class MovieFilter(filters.FilterSet):
 
     class Meta:
         model = MovieModel
-        fields = ['name', 'length_max', 'length_min', 'rating_max', 'rating_min', 'genre', 'year_max', 'year_min', 'is_now_showing']
+        fields = ['name','genre', 'rating','length','year','is_now_showing']
 
     def filter_is_now_showing(self, queryset, name, value):
         today = now().date()

@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework import permissions
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import (
     CreateAPIView,
     ListAPIView,
@@ -32,8 +33,15 @@ class MovieListCreateView(ListCreateAPIView):
 
     serializer_class = MovieSerializer
     queryset = MovieModel.objects.all()
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [
+        DjangoFilterBackend,
+        SearchFilter,
+        OrderingFilter
+    ]
+
     filterset_class = MovieFilter
+    search_fields = ["name"]
+    ordering_fields = ["rating", "year", "length"]
 
 
     def get_permissions(self):

@@ -18,7 +18,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.users.serializers import UserSerializer
 
-# from core.services.email_service import EmailService
+from core.services.email_services import EmailService
 
 
 UserModel = get_user_model()
@@ -62,6 +62,7 @@ class RegisterUserView(GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
+            EmailService.register(user)
             return Response(
                 {"detail": "User registered successfully.", "user": UserSerializer(user).data},
                 status=status.HTTP_201_CREATED
