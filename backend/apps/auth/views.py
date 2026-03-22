@@ -22,8 +22,6 @@ class ActivateUserView(GenericAPIView):
 
     permission_classes = (AllowAny,)
 
-
-
     def patch(self, *args, **kwargs):
         token = kwargs['token']
         user = JWTService.verify_token(token, ActivateToken)

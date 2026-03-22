@@ -8,7 +8,7 @@ from rest_framework.generics import (
     RetrieveAPIView,
     RetrieveUpdateAPIView,
     RetrieveUpdateDestroyAPIView,
-    UpdateAPIView,
+    UpdateAPIView, RetrieveDestroyAPIView,
 )
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
@@ -64,7 +64,7 @@ class HallDetailView(RetrieveUpdateDestroyAPIView):
 # HallSeat
 
 
-class HallSeatListView(ListCreateAPIView):
+class HallSeatListCreateView(ListCreateAPIView):
     """
     get:
         shows all hall seats(for all users) by hall_id
@@ -102,7 +102,7 @@ class HallSeatListView(ListCreateAPIView):
         return [permissions.AllowAny()]
 
     
-class HallSeatDetailView(RetrieveUpdateDestroyAPIView):
+class HallSeatDetailView(RetrieveDestroyAPIView):
     """
     get:
         shows seat by id(for all users)
@@ -115,9 +115,38 @@ class HallSeatDetailView(RetrieveUpdateDestroyAPIView):
     serializer_class = HallSeatSerializer
     queryset = HallSeatModel.objects.all()
 
+
     def get_permissions(self):
-        if self.request.method in ["PUT", "PATCH", "DELETE"]:
+        if self.request.method in ["POST"]:
             return [permissions.IsAdminUser()]
         return [permissions.AllowAny()]
+
+
+class HallSeatUpdateView(UpdateAPIView):
+    permission_classes = (IsAdminUser,)
+    serializer_class = HallSeatSerializer
+    def put(self, request, *args, **kwargs):
+        hall_id = self.kwargs.get("hall_id")
+
+        many = isinstance(request.data, list)
+        if not many:
+            return Response({"error": "Expected a list"}, status=status.HTTP_400_BAD_REQUEST)
+
+        updated = []
+        for seat_data in request.data:
+            seat_id = seat_data.get("id")
+            if not seat_id:
+                continue
+            try:
+                seat = HallSeatModel.objects.get(id=seat_id, hall_id=hall_id)
+                serializer = self.get_serializer(seat, data=seat_data, partial=True)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                updated.append(serializer.data)
+            except HallSeatModel.DoesNotExist:
+                continue
+
+        return Response({"updated": len(updated)}, status=status.HTTP_200_OK)
+
 
 

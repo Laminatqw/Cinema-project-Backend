@@ -23,7 +23,7 @@ class EmailService:
     @classmethod
     def register(cls, user:User):
         token = JWTService.create_token(user, ActivateToken)
-        url = f'http://localhost:8888/activate/{token}'
+        url = f'http://localhost:3000/activate/{token}'
         cls.__send_email.delay(
             user.email,
             'register.html',

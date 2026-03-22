@@ -22,7 +22,11 @@ class MovieSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MovieModel
-        fields = ('id','name', 'length', 'picture', 'trailer_link', 'rating', 'genres', 'genres_detail', 'year', 'is_now_showing')
+        fields = ('id','name', 'length',
+                  'picture', 'trailer_link',
+                  'rating', 'genres', 'genres_detail',
+                  'year', 'is_now_showing',
+                  'release_date','end_date')
 
     def get_is_now_showing(self, obj):
         return obj.is_now_showing
