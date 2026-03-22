@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.utils.timezone import now
 
 from rest_framework import permissions
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
@@ -20,6 +21,11 @@ class SessionListView(ListCreateAPIView):
 
     serializer_class = SessionSerializer
     queryset = SessionModel.objects.all()
+
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return SessionModel.objects.all()
+        return SessionModel.objects.filter(end_time__gte=now())
 
     def get_permissions(self):
         if self.request.method == "GET":
