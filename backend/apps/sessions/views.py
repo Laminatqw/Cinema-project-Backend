@@ -1,12 +1,18 @@
 from django.shortcuts import render
 from django.utils.timezone import now
+from requests import Response
 
 from rest_framework import permissions
-from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, get_object_or_404
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
+from rest_framework.views import APIView
 
-from apps.sessions.models import SessionModel
-from apps.sessions.serializer import SessionSerializer
+from apps.halls.models import HallSeatModel
+from apps.sessions.filters import SessionFilter
+from apps.sessions.models import SessionModel, SessionPriceModel
+from apps.sessions.serializer import SessionSerializer, SessionPriceSerializer
+from apps.tickets.models import TicketModel
+
 
 # Create your views here.
 
@@ -21,6 +27,9 @@ class SessionListView(ListCreateAPIView):
 
     serializer_class = SessionSerializer
     queryset = SessionModel.objects.all()
+    permission_classes = (IsAdminUser,)
+
+    filterset_class = SessionFilter
 
     def get_queryset(self):
         if self.request.user.is_staff:
@@ -51,3 +60,54 @@ class SessionDetailView(RetrieveUpdateDestroyAPIView):
         if self.request.method == "GET":
             return [permissions.AllowAny()]
         return [permissions.IsAdminUser()]
+
+
+
+class SessionPriceListView(ListCreateAPIView):
+    serializer_class = SessionPriceSerializer
+    #TODO: Description sessions
+
+    def get_queryset(self):
+        session_id = self.kwargs.get("session_id")
+        return SessionPriceModel.objects.filter(session_id=session_id)
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
+
+class SessionPriceDetailView(RetrieveUpdateDestroyAPIView):
+    serializer_class = SessionPriceSerializer
+    queryset = SessionPriceModel.objects.all()
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
+
+class SessionSeatsView(APIView):
+    """
+    get:
+        returns all seats for session with their availability
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, session_id):
+        session = get_object_or_404(SessionModel, id=session_id)
+        seats = HallSeatModel.objects.filter(hall=session.hall)
+        taken_seat_ids = TicketModel.objects.filter(
+            session=session,
+            status__in=['reserved', 'paid']
+        ).values_list('seat_id', flat=True)
+
+        data = [
+            {
+                'id': seat.id,
+                'row': seat.row,
+                'number': seat.number,
+                'seat_type': seat.seat_type,
+                'is_taken': seat.id in taken_seat_ids
+            }
+            for seat in seats
+        ]
+        return Response(data)

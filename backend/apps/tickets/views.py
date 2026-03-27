@@ -13,6 +13,8 @@ from rest_framework.views import APIView
 import qrcode
 
 from apps import sessions
+from apps.halls.models import HallSeatModel
+from apps.sessions.models import SessionModel
 from apps.tickets.models import TicketModel
 from apps.tickets.serializer import TicketDetailSerializer, TicketSerializer
 
@@ -88,48 +90,50 @@ class TicketQRView(APIView):
         return HttpResponse(buffer, content_type="image/png")
 
 
-class TicketValidateView(APIView):
 
-    """
-    post:
-        checks if ticket is valid, if true changes is to used
-    """
 
-    permission_classes = (IsAdminUser,)
-
-    def post(self, request):
-        uuid = request.data.get("uuid")
-        ticket = get_object_or_404(TicketModel, uuid=uuid)
-
-        # Перевірки
-        if ticket.status == "used":
-            return Response({"valid": False, "reason": "Квиток вже використаний"}, status=400)
-
-        if ticket.session.start_time < timezone.now() < ticket.session.end_time:
-            # Маркуємо як використаний
-            ticket.status = "used"
-            ticket.save()
-            return Response({"valid":True,
-                             "reason":"Квиток провалідовано",
-                            "ticket_id": ticket.id,
-                            "movie": ticket.session.movie.name,
-                            "hall": ticket.seat.hall.title,
-                            "row": ticket.seat.row,
-                            "seat": ticket.seat.number,
-                            "time": ticket.session.start_time}, status=200)
-
-        elif ticket.session.start_time > timezone.now():
-            return Response({
-                             "ticket_id": ticket.id,
-                             "movie": ticket.session.movie.name,
-                             "hall": ticket.seat.hall.title,
-                             "row": ticket.seat.row,
-                             "seat": ticket.seat.number,
-                             "valid": False, "reason": "Сеанс ще не почався",
-                             "time": ticket.session.start_time}, status=400)
-
-        else:
-            return Response({"valid":False, "reason": "Сеанс вже закінчився"}, status=400)
+# class TicketValidateView(APIView):
+#
+#     """
+#     post:
+#         checks if ticket is valid, if true changes is to used
+#     """
+#
+#     permission_classes = (IsAdminUser,)
+#
+#     def post(self, request):
+#         uuid = request.data.get("uuid")
+#         ticket = get_object_or_404(TicketModel, uuid=uuid)
+#
+#         # Перевірки
+#         if ticket.status == "used":
+#             return Response({"valid": False, "reason": "Квиток вже використаний"}, status=400)
+#
+#         if ticket.session.start_time < timezone.now() < ticket.session.end_time:
+#             # Маркуємо як використаний
+#             ticket.status = "used"
+#             ticket.save()
+#             return Response({"valid":True,
+#                              "reason":"Квиток провалідовано",
+#                             "ticket_id": ticket.id,
+#                             "movie": ticket.session.movie.name,
+#                             "hall": ticket.seat.hall.title,
+#                             "row": ticket.seat.row,
+#                             "seat": ticket.seat.number,
+#                             "time": ticket.session.start_time}, status=200)
+#
+#         elif ticket.session.start_time > timezone.now():
+#             return Response({
+#                              "ticket_id": ticket.id,
+#                              "movie": ticket.session.movie.name,
+#                              "hall": ticket.seat.hall.title,
+#                              "row": ticket.seat.row,
+#                              "seat": ticket.seat.number,
+#                              "valid": False, "reason": "Сеанс ще не почався",
+#                              "time": ticket.session.start_time}, status=400)
+#
+#         else:
+#             return Response({"valid":False, "reason": "Сеанс вже закінчився"}, status=400)
 
 
 
