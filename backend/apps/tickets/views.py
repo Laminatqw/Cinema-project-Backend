@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
-from rest_framework import permissions
+from rest_framework import permissions, status
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
@@ -33,8 +33,24 @@ class TicketsListView(ListCreateAPIView):
     serializer_class = TicketSerializer
     queryset = TicketModel.objects.all()
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    # def perform_create(self, serializer):
+    #     serializer.save(user=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        many = isinstance(request.data, list)
+        serializer = self.get_serializer(data=request.data, many=many)
+        serializer.is_valid(raise_exception=True)
+
+        if many:
+            tickets = [
+                TicketModel(user=request.user, **ticket)
+                for ticket in serializer.validated_data
+            ]
+            TicketModel.objects.bulk_create(tickets)
+            return Response({"created": len(tickets)}, status=status.HTTP_201_CREATED)
+
+        serializer.save(user=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def get_queryset(self):
         return TicketModel.objects.filter(user=self.request.user)
@@ -50,9 +66,13 @@ class TicketsDetailView(RetrieveUpdateDestroyAPIView):
         deletes ticket by id(only for staff)
     """
 
-    serializer_class = TicketSerializer
+
     queryset = TicketModel.objects.all()
 
+    def get_serializer_class(self):
+        if self.request.method == "GET":
+            return TicketDetailSerializer
+        return TicketSerializer
     def get_queryset(self):
         return TicketModel.objects.filter(user=self.request.user)
 

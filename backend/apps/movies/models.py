@@ -23,7 +23,7 @@ class MovieModel(BaseModel):
     name = models.CharField(max_length=100)
     length = models.IntegerField()
     picture = models.ImageField(upload_to=upload_poster, blank=True)
-    trailer_link = models.URLField()
+    trailer_link = models.URLField(blank=True)
     rating = models.IntegerField()
     genres = models.ManyToManyField(GenreModel, related_name="movies")
     year = models.IntegerField()

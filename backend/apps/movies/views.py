@@ -96,6 +96,7 @@ class GenresListCreateAPIView(ListCreateAPIView):
     """
     serializer_class = GenreSerializer
     queryset = GenreModel.objects.all()
+    pagination_class = None
     
     def get_permissions(self):
         if self.request.method == "POST":

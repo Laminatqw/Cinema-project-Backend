@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.utils.timezone import now
-from requests import Response
+from rest_framework.response import Response
 
 from rest_framework import permissions
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, get_object_or_404
@@ -86,15 +86,13 @@ class SessionPriceDetailView(RetrieveUpdateDestroyAPIView):
         return [permissions.IsAdminUser()]
 
 class SessionSeatsView(APIView):
-    """
-    get:
-        returns all seats for session with their availability
-    """
     permission_classes = [permissions.AllowAny]
 
     def get(self, request, session_id):
         session = get_object_or_404(SessionModel, id=session_id)
+
         seats = HallSeatModel.objects.filter(hall=session.hall)
+
         taken_seat_ids = TicketModel.objects.filter(
             session=session,
             status__in=['reserved', 'paid']
@@ -110,4 +108,5 @@ class SessionSeatsView(APIView):
             }
             for seat in seats
         ]
+
         return Response(data)

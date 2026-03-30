@@ -6,32 +6,26 @@ from apps.movies.models import MovieModel
 
 
 class MovieFilter(filters.FilterSet):
-
     name = filters.CharFilter(lookup_expr="icontains")
-    genre = filters.BaseInFilter(field_name="genre__id", lookup_expr="in")
-
-    class Meta:
-        model = MovieModel
-        fields = {
-            "rating": ["exact", "gte", "lte"],
-            "length": ["gte", "lte"],
-            "year": ["exact", "gte", "lte"],
-            }
-
-    IS_NOW_SHOWING_CHOICES = (
-        ('yes', 'Yes'),
-        ('no', 'No'),
-    )
-
+    genre = filters.BaseInFilter(field_name="genres__id", lookup_expr="in")
     is_now_showing = filters.ChoiceFilter(
-        choices=IS_NOW_SHOWING_CHOICES,
+        choices=(('yes', 'Yes'), ('no', 'No')),
         method='filter_is_now_showing',
         label='Is Now Showing'
     )
+    rating__gte = filters.NumberFilter(field_name="rating", lookup_expr="gte")
+    rating__lte = filters.NumberFilter(field_name="rating", lookup_expr="lte")
+    length__gte = filters.NumberFilter(field_name="length", lookup_expr="gte")
+    length__lte = filters.NumberFilter(field_name="length", lookup_expr="lte")
+    year__exact = filters.NumberFilter(field_name="year", lookup_expr="exact")
+    year__gte = filters.NumberFilter(field_name="year", lookup_expr="gte")
+    year__lte = filters.NumberFilter(field_name="year", lookup_expr="lte")
 
     class Meta:
         model = MovieModel
-        fields = ['name','genre', 'rating','length','year','is_now_showing']
+        fields = ['name', 'genres', 'rating__gte', 'rating__lte',
+                  'length__gte', 'length__lte', 'year__exact',
+                  'year__gte', 'year__lte', 'is_now_showing']
 
     def filter_is_now_showing(self, queryset, name, value):
         today = now().date()
