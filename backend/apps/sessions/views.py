@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.utils.timezone import now
 from rest_framework.response import Response
 
-from rest_framework import permissions
+from rest_framework import permissions, status
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, get_object_or_404
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.views import APIView
@@ -90,6 +90,9 @@ class SessionSeatsView(APIView):
 
     def get(self, request, session_id):
         session = get_object_or_404(SessionModel, id=session_id)
+
+        if session.end_time and session.end_time < now():
+            return Response({"error": "Сесія вже завершена"}, status=status.HTTP_400_BAD_REQUEST)
 
         seats = HallSeatModel.objects.filter(hall=session.hall)
 

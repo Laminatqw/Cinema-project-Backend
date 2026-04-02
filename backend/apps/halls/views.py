@@ -73,6 +73,7 @@ class HallSeatListCreateView(ListCreateAPIView):
     """
 
     serializer_class = HallSeatSerializer
+    pagination_class = None
 
     def get_queryset(self):
         hall_id = self.kwargs.get("hall_id")
@@ -107,17 +108,29 @@ class HallSeatDetailView(RetrieveDestroyAPIView):
     get:
         shows seat by id(for all users)
     delete:
-        deletes seat by id(only for staff)
+        deletes seat by id(only for staff) or all seats by hall_id if no pk
     """
-
 
     permission_classes = (IsAdminUser,)
     serializer_class = HallSeatSerializer
     queryset = HallSeatModel.objects.all()
 
+    def delete(self, request, *args, **kwargs):
+        pk = kwargs.get('pk')
+        hall_id = kwargs.get('hall_id')
+
+        if pk:
+            # видалення одного місця
+            return super().delete(request, *args, **kwargs)
+        elif hall_id:
+            # видалення всіх місць залу
+            deleted, _ = HallSeatModel.objects.filter(hall_id=hall_id).delete()
+            return Response({"deleted": deleted}, status=status.HTTP_200_OK)
+
+        return Response({"error": "No pk or hall_id provided"}, status=status.HTTP_400_BAD_REQUEST)
 
     def get_permissions(self):
-        if self.request.method in ["POST"]:
+        if self.request.method in ["DELETE"]:
             return [permissions.IsAdminUser()]
         return [permissions.AllowAny()]
 
