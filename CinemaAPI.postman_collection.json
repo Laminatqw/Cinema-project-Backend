@@ -1,0 +1,2025 @@
+{
+  "info": {
+    "_postman_id": "b428fa58-09f5-4385-9a8e-b1181fc6a199",
+    "name": "CinemaAPI",
+    "description": "Auth api - allows login, change password and activate created account\n\nUser api - allows get user info, registration, logout, getAllUsers, edit user info\n\nMovie api - allow get, filter, create, edit, delete movies; load poster for movies; get, create, delete, edit genres\n\nHall api - allows get, create, edit, delete halls  \nHall\\`s seat api - allows get seat/seats; delete seat; create, edit seats  \nSession API - allows get session; filter session by movie/date; get all session seats; create, edit, delete session;\n\nTicket api - allow get tickets of specified user; get qr code of specified ticket; create ticket;",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "37377666"
+  },
+  "item": [
+    {
+      "name": "Auth API",
+      "item": [
+        {
+          "name": "UserLogin(get tokens)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Отримуємо токени з відповіді\r",
+                  "const res = pm.response.json();\r",
+                  "\r",
+                  "\r",
+                  "// Зберігаємо токени у змінні оточення\r",
+                  "pm.environment.set(\"access\", res.access);\r",
+                  "pm.environment.set(\"refresh\", res.refresh);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "email",
+                  "value": "user1@gmail.com",
+                  "type": "text",
+                  "uuid": "dc869949-306a-4273-b802-d0d999ce542e"
+                },
+                {
+                  "key": "password",
+                  "value": "qwerty",
+                  "type": "text",
+                  "uuid": "3c0d6489-bad7-4a50-a16a-1c6ec2892bab"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{host}}/api/auth",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "auth"
+              ],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Request Recovery Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "email",
+                  "value": "user1@gmail.com",
+                  "type": "text",
+                  "uuid": "dc869949-306a-4273-b802-d0d999ce542e",
+                  "disabled": true
+                },
+                {
+                  "key": "password",
+                  "value": "qwerty",
+                  "type": "text",
+                  "uuid": "3c0d6489-bad7-4a50-a16a-1c6ec2892bab",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{host}}/api/auth/recovery",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "recovery"
+              ],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recovery change password(token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Отримуємо токени з відповіді\r",
+                  "const res = pm.response.json();\r",
+                  "\r",
+                  "\r",
+                  "// Зберігаємо токени у змінні оточення\r",
+                  "pm.environment.set(\"refresh\", res.refresh);\r",
+                  "pm.environment.set(\"access\", res.access);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "password",
+                  "value": "qwerty",
+                  "type": "text",
+                  "uuid": "dbf7958e-1ddc-457d-9790-17388ef75d47"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{host}}/api/auth/recovery/:token",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "recovery",
+                ":token"
+              ],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "",
+                  "type": "text",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVjb3ZlcnlfcGFzc3dvcmQiLCJleHAiOjE3NTgxMDQ0MDIsImlhdCI6MTc1ODEwMzgwMiwianRpIjoiMWFjZDY1N2QxNGZkNDgwNWIwZTU2NTBmYmRmMjhhNmMiLCJ1c2VyX2lkIjoiNSJ9.1mvATHhmI5-Er0DOG4pUU6zYCUq-SzqA8D3Puz4G3E0"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "RefreshToken",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Отримуємо токени з відповіді\r",
+                  "const res = pm.response.json();\r",
+                  "\r",
+                  "\r",
+                  "// Зберігаємо токени у змінні оточення\r",
+                  "pm.environment.set(\"refresh\", res.refresh);\r",
+                  "pm.environment.set(\"access\", res.access);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "refresh",
+                  "value": "{{refresh}}",
+                  "type": "text",
+                  "uuid": "9f44c26b-12d2-464d-88f5-62d36a70d618"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{host}}/api/auth/refresh",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "refresh"
+              ],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UserActivation",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/auth/activate/:token",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "activate",
+                ":token"
+              ],
+              "variable": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWN0aXZhdGUiLCJleHAiOjE3NzMwNzI5NDYsImlhdCI6MTc3MzA3MTE0NiwianRpIjoiYjE3MGJjMzE0ZjRhNDcxNDgzMWYyYzg3M2EwZGQyYjQiLCJ1c2VyX2lkIjoiMTAifQ.F-nv3kqUr83apD26IgTmNysndVrARqYHEmr5GS1yoD0"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "UserLogin - sends email and password - get access and refresh jwt tokens  \nRequest Recovery Password - sends email - get letter on specified email with recovery link  \nRecovery change password - sends token and email - changes password  \nRefresh Token - sends email token - get new pair of token  \nUser Activation - sends token - activates account"
+    },
+    {
+      "name": "UserAPI",
+      "item": [
+        {
+          "name": "Get my user info",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Отримуємо токени з відповіді\r",
+                  "const res = pm.response.json();\r",
+                  "\r",
+                  "\r",
+                  "// Зберігаємо токени у змінні оточення\r",
+                  "pm.environment.set(\"refresh\", res.refresh);\r",
+                  "pm.environment.set(\"access\", res.access);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": []
+            },
+            "url": {
+              "raw": "{{host}}/api/users/info",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "info"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "RegUser",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"example@gmail.com\",\r\n    \"password\": \"qwerty\",\r\n    \"profile\": {\r\n        \"name\": \"AAAAA\",\r\n        \"surname\":\"BBBBB\",\r\n        \"age\": 22\r\n    }\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/users/me",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UserLogout",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "refresh",
+                  "value": "{{refresh}}",
+                  "type": "text",
+                  "uuid": "a93b2f69-ad00-479f-b22e-d1d8ebe73256"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{host}}/api/users/logout",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Users",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"user1@gmail.com\",\r\n    \"password\": \"qwerty\",\r\n    \"profile\":{\r\n        \"name\": \"Arkadiy\",\r\n        \"age\": 25\r\n\r\n    }\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/users",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Edit user info",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"profile\":{\r\n        \"name\": \"Andrew\",\r\n        \"surname\":\"BBBB\",\r\n        \"age\": 22\r\n    }\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/users/info",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "info"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Get my user info - needs access token - returns information about user itself  \nRegUser - sends email, password (profile info optional) - returns letter on specified email with activation link  \nLogOut - needs refresh token - puts token into blacklist(logout from account)  \nGetAllUser - needs access token(for staff only) - return paginatied user list  \nEdit user info - needs access token, and information what will be changed - return"
+    },
+    {
+      "name": "MovieAPI",
+      "item": [
+        {
+          "name": "Get all movies",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": []
+            },
+            "url": {
+              "raw": "{{host}}/api/movies",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "movies"
+              ],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "2",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "3",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Movie by Id",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": []
+            },
+            "url": {
+              "raw": "{{host}}/api/movies/1",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "movies",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all movies by filter",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "email",
+                  "value": "victor.kinash47@gmail.com",
+                  "type": "text",
+                  "uuid": "08ed5b52-a263-462b-aed7-7170ab9c46c5",
+                  "disabled": true
+                },
+                {
+                  "key": "password",
+                  "value": "qwerty",
+                  "type": "text",
+                  "uuid": "23516976-1e71-42d7-84ac-dd10cf3185b6",
+                  "disabled": true
+                },
+                {
+                  "key": "Bearer Token",
+                  "value": "{{access}}",
+                  "type": "text",
+                  "uuid": "1420f543-0c1c-474b-aaf7-b2b7e7a32963",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{host}}/api/movies?rating__gte=6&rating__lte=10&length__gte=5&length__lte=7&year__gte=2010&year__lte=2011&page=1",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "movies"
+              ],
+              "query": [
+                {
+                  "key": "rating__gte",
+                  "value": "6"
+                },
+                {
+                  "key": "rating__lte",
+                  "value": "10"
+                },
+                {
+                  "key": "length__gte",
+                  "value": "5"
+                },
+                {
+                  "key": "length__lte",
+                  "value": "7"
+                },
+                {
+                  "key": "year__gte",
+                  "value": "2010"
+                },
+                {
+                  "key": "year__lte",
+                  "value": "2011"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "email",
+                  "value": "",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "3",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Movie",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "name",
+                  "value": "MGS: V",
+                  "type": "text",
+                  "uuid": "8c541e44-4631-40a6-bc20-5f352923e43f"
+                },
+                {
+                  "key": "length",
+                  "value": "120",
+                  "type": "text",
+                  "uuid": "db74b927-8e6c-4c6e-bfd3-ea8bfb5a5d02"
+                },
+                {
+                  "key": "trailer_link",
+                  "value": "https://www.youtube.com/watch?v=rp0n9RPoDI4",
+                  "type": "text",
+                  "uuid": "88625f17-3c74-4f25-8fe5-ee9f9aed3d9f"
+                },
+                {
+                  "key": "rating",
+                  "value": "95",
+                  "type": "text",
+                  "uuid": "f0539462-aa19-4f8c-b7da-415cfc84e459"
+                },
+                {
+                  "key": "genres",
+                  "value": "1",
+                  "type": "text",
+                  "uuid": "f839a6b7-799e-42eb-909a-d0f51e8aa77d"
+                },
+                {
+                  "key": "year",
+                  "value": "123",
+                  "type": "text",
+                  "uuid": "1710071c-3d5a-407c-9029-000660508516"
+                },
+                {
+                  "key": "release_date",
+                  "value": "2025-10-03",
+                  "type": "text",
+                  "uuid": "1c8cc618-b297-4410-94cf-2e7a85a0fda9"
+                },
+                {
+                  "key": "end_date",
+                  "value": "2027-10-03",
+                  "type": "text",
+                  "uuid": "c8cf6868-dd34-4aa5-9048-da6f1b6ee966"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{host}}/api/movies",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "movies"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change movie info",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "release_date",
+                  "value": "2010-07-16",
+                  "type": "text",
+                  "uuid": "0b241e1b-22c4-4f14-9394-ceaafc2653c1"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{host}}/api/movies/2",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "movies",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete movie by ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": []
+            },
+            "url": {
+              "raw": "{{host}}/api/movies/3",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "movies",
+                "3"
+              ],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "load picture",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "picture",
+                  "type": "file",
+                  "uuid": "4f62517a-17d9-4f41-81bc-6c8a57355ad8",
+                  "src": "/C:/Users/User/Downloads/header.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{host}}/api/movies/1/poster",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "movies",
+                "1",
+                "poster"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get all genres",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/movies/genres",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "movies",
+                "genres"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "get all genres",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{host}}/api/movies/genres",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "path": [
+                    "api",
+                    "movies",
+                    "genres"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": null,
+              "header": null,
+              "cookie": [],
+              "body": null
+            }
+          ]
+        },
+        {
+          "name": "Create genre",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "genre_name",
+                  "value": "horror",
+                  "type": "text",
+                  "uuid": "98d0c245-0bec-4db5-9b70-3859ee10e2c6"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{host}}/api/movies/genres",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "movies",
+                "genres"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get genre by id",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": []
+            },
+            "url": {
+              "raw": "{{host}}/api/movies/genres/13",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "movies",
+                "genres",
+                "13"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete genre by ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": []
+            },
+            "url": {
+              "raw": "{{host}}/api/movies/genres/13",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "movies",
+                "genres",
+                "13"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Edit genre by ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "genre_name",
+                  "value": "laos",
+                  "type": "text",
+                  "uuid": "7efa3d83-919c-49e6-a63d-45270fc36580"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{host}}/api/movies/genres/8",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "movies",
+                "genres",
+                "8"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "get all movies - returns all movies  \nget movie by id - returns specified movie  \nget movie by filter - sends parameters for filter - returns filtered movies  \ncreate movie - needs access token(only staff), sends data about film - return created film  \n  \nchange movie info - needs access token(only staff), sends part or full changed data about film - return changed film  \n  \ndelete movie by id - needs access token(only staff), - deletes specified movie  \nload picture - needs access token(only staff), sends file  \nget all genres - return all genres  \ncreate genre - needs access token(only staff), sends genre_name - creates genre  \nget genre by id - returns specified genre  \ndelete genre by id - needs access token(only staff) - deletes specified genre  \nedit genre by id - needs access token(only staff), sends changed genre_name - changes specified genre"
+    },
+    {
+      "name": "HallsAPI",
+      "item": [
+        {
+          "name": "Get all halls",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": []
+            },
+            "url": {
+              "raw": "{{host}}/api/halls",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "halls"
+              ],
+              "query": [
+                {
+                  "key": "oktyabrskiy",
+                  "value": "100",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create hall",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "title",
+                  "value": "odesskiy",
+                  "type": "text",
+                  "uuid": "1626f0ed-4940-4f0a-aa83-50c84dd02755"
+                },
+                {
+                  "key": "total_seats",
+                  "value": "80",
+                  "type": "text",
+                  "uuid": "a35c8e7b-1a39-43d1-9613-d27f71e6afda"
+                },
+                {
+                  "key": "hall_type",
+                  "value": "imax",
+                  "type": "text",
+                  "uuid": "ebc31431-3e84-48a2-955d-05fecd142a10"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{host}}/api/halls",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "halls"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change hall info by id",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "title",
+                  "value": "odessa",
+                  "type": "text",
+                  "uuid": "771dff99-ca47-4bbf-b664-b265251180f9"
+                },
+                {
+                  "key": "total_seats",
+                  "value": "3",
+                  "type": "text",
+                  "uuid": "af76cb44-bc55-41e9-bc90-68bdf55803ad",
+                  "disabled": true
+                },
+                {
+                  "key": "hall_type",
+                  "value": "",
+                  "type": "text",
+                  "uuid": "9bf99d45-c495-414a-a833-3667e5c28bf9",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{host}}/api/halls/2",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "halls",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete hall",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": []
+            },
+            "url": {
+              "raw": "{{host}}/api/halls/1",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "halls",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "get all halls - return all halls  \ncreate hall - needs access token(only staff), sends data - returns created hall  \nchange hall info by id - needs access token(only staff), sends part or full changed data - returns changed hall  \n  \ndelete hall by id - needs access token(only staff) - deletes specified hall"
+    },
+    {
+      "name": "Hall`s seats API",
+      "item": [
+        {
+          "name": "Get all seats by hall id",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": []
+            },
+            "url": {
+              "raw": "{{host}}/api/halls/2/seats",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "halls",
+                "2",
+                "seats"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get seat by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/halls/seats/359",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "halls",
+                "seats",
+                "359"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete seat by id",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/halls/seats/14",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "halls",
+                "seats",
+                "14"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create seat/seats by hall_ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "[{\"hall\": 2, \"row\": 1, \"number\": 19},\r\n{\"hall\": 2, \"row\": 1, \"number\": 16},\r\n{\"hall\": 2, \"row\": 1, \"number\": 17},\r\n{\"hall\": 2, \"row\": 1, \"number\": 18}]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/halls/2/seats",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "halls",
+                "2",
+                "seats"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change seat info by seat_ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "seat_type",
+                  "value": "vip",
+                  "type": "text",
+                  "uuid": "0cbc2cc6-05b3-4534-872e-5f888a9dfbf9"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{host}}/api/halls/seats/14",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "halls",
+                "seats",
+                "14"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "get all seats by hall id - returns all seats of specified hall\n\nget seat by id - returns specified seat  \ndelete seat - _**needs access token(only staff) -**_ deletes specified seat by its id\n\ncreate seat/seats - _**needs access token(only staff),**_ sends bulk data- create 1 or more seats in specified hall  \n  \nchange seat info by seat_ID - _**needs access token(only staff),**_ can be bulk \\- edit specified seat by its id"
+    },
+    {
+      "name": "Sessions API",
+      "item": [
+        {
+          "name": "Get all sessions",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/sessions",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "sessions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all sessions by movie id",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/sessions?movie=2",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "sessions"
+              ],
+              "query": [
+                {
+                  "key": "movie",
+                  "value": "2"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all sessions by date",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/sessions?date=2026-04-01",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "sessions"
+              ],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2026-04-01"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all seats by session_ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/sessions/16/seats",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "16",
+                "seats"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get all prices by session_ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/sessions/10/prices",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "10",
+                "prices"
+              ],
+              "query": [
+                {
+                  "key": "movie",
+                  "value": "2",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create prices for session",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n{\r\n  \"session\": 10,\r\n  \"seat_type\": \"regular\",\r\n  \"price\": \"100.00\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/sessions/10/prices",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "10",
+                "prices"
+              ],
+              "query": [
+                {
+                  "key": "movie",
+                  "value": "2",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create sessions",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"movie\": 11,\r\n  \"hall\": 2,\r\n  \"start_time\": \"2025-10-03T18:00:00Z\",\r\n  \"end_time\": \"2027-10-03T20:00:00Z\",\r\n  \"prices\": [\r\n    {\r\n      \"seat_type\": \"regular\",\r\n      \"price\": 150\r\n    },\r\n    {\r\n      \"seat_type\": \"vip\",\r\n      \"price\": 250\r\n    }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/sessions",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "sessions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "edit session by ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"movie\": 11,\r\n  \"hall\": 2,\r\n  \"start_time\": \"2025-10-03T18:00:00Z\",\r\n  \"end_time\": \"2027-10-03T20:00:00Z\",\r\n  \"prices\": [\r\n    {\r\n      \"seat_type\": \"regular\",\r\n      \"price\": 150\r\n    },\r\n    {\r\n      \"seat_type\": \"vip\",\r\n      \"price\": 250\r\n    }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/sessions/2",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Session by id",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": []
+            },
+            "url": {
+              "raw": "{{host}}/api/sessions/3",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "sessions",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "get all session - returns all session  \nget all session by movie id - returns session filtered by movie ID  \nget all session by date - returns session filtered by date  \nget all seats by session ID - returns all seats in specified session  \nCreate session - _**needs access token(only staff),**_ sends session data - returns created session\n\nEdit session by id - _**needs access token(only staff),**_ sends changed session data - returns edited session\n\nDelete Session by id - _**needs access token(only staff), -**_ deletes specified session"
+    },
+    {
+      "name": "Tickets API",
+      "item": [
+        {
+          "name": "Get tickets",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/api/tickets",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "tickets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get ticket QR",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": []
+            },
+            "url": {
+              "raw": "{{host}}/api/tickets/0730fdbe-51d7-40b8-b405-a93bbcea0264/qr",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "tickets",
+                "0730fdbe-51d7-40b8-b405-a93bbcea0264",
+                "qr"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create ticket",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Отримуємо токени з відповіді\r",
+                  "const res = pm.response.json();\r",
+                  "\r",
+                  "\r",
+                  "// Зберігаємо токени у змінні оточення\r",
+                  "pm.environment.set(\"ticketID\", res.uuid);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"user\": 2,\r\n    \"session\": 10,\r\n    \"seat\": 16\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/api/tickets",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "tickets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ticket validation",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "ticket_id",
+                  "value": "13",
+                  "type": "text",
+                  "uuid": "7b2c54c0-7eba-4bb9-8840-0dd91f7aee1f",
+                  "disabled": true
+                },
+                {
+                  "key": "uuid",
+                  "value": "{{ticketID}}",
+                  "type": "text",
+                  "uuid": "032c74c7-3377-43c7-8838-9e6a0d2c714b"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{host}}/api/tickets/validate",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "api",
+                "tickets",
+                "validate"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "get tickets - needs access token(authenticated users) - returns all tickets of specified user  \nget ticket QR - needs access token(authenticated users) - returns qr of specified uuid  \ncreate ticket - needs access token(authenticated users), sends data of ticker - returns created ticket  \nticket validation(currently disabled on API) - needs access token(staff only), sends ticket uuid - changes ticket status"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}
