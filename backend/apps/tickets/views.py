@@ -121,7 +121,7 @@ class TicketQRView(APIView):
 #
 #     """
 #     post:
-#         checks if ticket is valid, if true changes is to used
+#         checks if ticket is valid, if true changes is to used(it`s actually working, for like staff who checks tickets)
 #     """
 #
 #     permission_classes = (IsAdminUser,)
