@@ -23,18 +23,25 @@ from apps.tickets.serializer import TicketDetailSerializer, TicketSerializer
 class TicketsListView(ListCreateAPIView):
 
     """
-    get:
-        shows user only his tickets(if not staff)
-    post:
-        creates ticket(for authenticated user)
+        get:
+            returns all tickets of specified user
+        post:
+            creates one or many(bulk) tickets
+
     """
 
+
+
     permission_classes = (IsAuthenticated,)
-    serializer_class = TicketSerializer
     queryset = TicketModel.objects.all()
 
-    # def perform_create(self, serializer):
-    #     serializer.save(user=self.request.user)
+    def get_serializer_class(self):
+        if self.request.method == "GET":
+            return TicketDetailSerializer
+        return TicketSerializer
+
+    def get_queryset(self):
+        return TicketModel.objects.filter(user=self.request.user)
 
     def create(self, request, *args, **kwargs):
         many = isinstance(request.data, list)
@@ -52,8 +59,6 @@ class TicketsListView(ListCreateAPIView):
         serializer.save(user=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def get_queryset(self):
-        return TicketModel.objects.filter(user=self.request.user)
 
 class TicketsDetailView(RetrieveUpdateDestroyAPIView):
 

@@ -68,7 +68,7 @@ class HallSeatListCreateView(ListCreateAPIView):
     """
     get:
         shows all hall seats(for all users) by hall_id
-    post
+    post:
         creates a new hall seat|seats(only for staff) by hall_id
     """
 
@@ -136,6 +136,13 @@ class HallSeatDetailView(RetrieveDestroyAPIView):
 
 
 class HallSeatUpdateView(UpdateAPIView):
+
+    """
+    put:
+        update seat, one or bulk
+    """
+
+
     permission_classes = (IsAdminUser,)
     serializer_class = HallSeatSerializer
     def put(self, request, *args, **kwargs):

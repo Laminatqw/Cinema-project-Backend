@@ -64,8 +64,18 @@ class SessionDetailView(RetrieveUpdateDestroyAPIView):
 
 
 class SessionPriceListView(ListCreateAPIView):
+
+
+    """
+
+    get:
+        returns prices of session by session id
+    post:
+        create price for session by session id
+    """
+
+
     serializer_class = SessionPriceSerializer
-    #TODO: Description sessions
 
     def get_queryset(self):
         session_id = self.kwargs.get("session_id")
@@ -86,6 +96,11 @@ class SessionPriceDetailView(RetrieveUpdateDestroyAPIView):
         return [permissions.IsAdminUser()]
 
 class SessionSeatsView(APIView):
+    """
+        get:
+            returns all seats for session with their availability
+        """
+
     permission_classes = [permissions.AllowAny]
 
     def get(self, request, session_id):

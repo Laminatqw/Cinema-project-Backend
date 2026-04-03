@@ -54,6 +54,12 @@ class UsersRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
 
 
 class RegisterUserView(GenericAPIView):
+
+    """
+        post:
+            register user
+    """
+
     serializer_class = UserSerializer
     queryset = UserModel.objects.all()
     permission_classes = [AllowAny]
@@ -70,6 +76,12 @@ class RegisterUserView(GenericAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LogoutView(APIView):
+
+    """
+        post:
+            logout user by refresh token
+    """
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
